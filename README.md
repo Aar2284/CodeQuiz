@@ -2,19 +2,14 @@
 
 <div align="center">
 
-  <img src="https://img.shields.io/badge/CodeQuiz-1E293B?style=for-the-badge&logo=codeforces&logoColor=white" alt="Logo" />
+  <img src="https://img.shields.io/badge/CodeQuiz-1A3766?style=for-the-badge&logo=codeforces&logoColor=white" alt="Logo" />
+  
 
   <p align="center">
     A robust, role-based quiz platform built with Django, featuring automated grading, real-time timers, and performance analytics.
     <br />
     <a href="#-key-features"><strong>Explore the features »</strong></a>
     <br />
-    <br />
-    <a href="#-quick-start">Quick Start</a>
-    ·
-    <a href="#-screens">Screenshots</a>
-    ·
-    <a href="#-contribution">Contribution</a>
   </p>
 </div>
 
