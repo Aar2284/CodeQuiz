@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard - Enterprise Quiz System</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: 'Poppins', sans-serif;
+    background-color: #0F172A;  /* Deep navy */
+    color: #F1F5F9;
+}
+
+/* Navbar */
+.navbar-custom {
+    background-color: #1E293B;
+}
+
+/* Cards */
+.glass-card {
+    background: #1E293B;
+    border-radius: 16px;
+    padding: 30px;
+    box-shadow: 0 6px 25px rgba(0,0,0,0.4);
+    transition: 0.3s ease;
+}
+
+.glass-card:hover {
+    transform: translateY(-6px);
+}
+
+/* Buttons */
+.btn-glow {
+    background-color: #2563EB;
+    border: none;
+    border-radius: 30px;
+    padding: 10px 20px;
+    font-weight: 600;
+    transition: 0.3s ease;
+}
+
+.btn-glow:hover {
+    background-color: #1D4ED8;
+    box-shadow: 0 0 15px rgba(37, 99, 235, 0.6);
+}
+
+/* Inputs */
+.form-control {
+    background: #334155;
+    border: 1px solid #475569;
+    color: white;
+}
+
+.form-control:focus {
+    background: #334155;
+    border-color: #2563EB;
+    box-shadow: 0 0 10px rgba(37, 99, 235, 0.5);
+    color: white;
+}
+
+/* Stats */
+.stat-number {
+    font-size: 32px;
+    font-weight: bold;
+    color: #60A5FA;
+}
+</style>
+</head>
+
+<body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark navbar-custom px-4">
+    <a class="navbar-brand fw-bold" href="#">Enterprise Quiz</a>
+
+    <div class="ms-auto">
+        <span class="me-3">Welcome, {{ request.user.username }}</span>
+        <a href="{% url 'logout' %}" class="btn btn-glow text-white">Logout</a>
+    </div>
+</nav>
+
+<div class="container mt-5">
+
+    <h2 class="mb-4 fw-bold">Student Dashboard</h2>
+
+    <!-- Error Messages -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-danger text-dark">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="row g-4">
+
+        <div class="col-md-4">
+            <div class="glass-card text-center">
+                <p>Total Quizzes Attempted</p>
+                <div class="stat-number">{{ total_attempts }}</div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="glass-card text-center">
+                <p>Average Score</p>
+                <div class="stat-number">{{ average_score }}%</div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="glass-card text-center">
+                <p>Highest Score</p>
+                <div class="stat-number">{{ highest_score }}%</div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Browse Section -->
+    <div class="mt-5">
+        <div class="glass-card text-center">
+            <h4 class="mb-3">Ready for a new challenge?</h4>
+            <a href="{% url 'available_quizzes' %}" class="btn btn-glow text-white">
+                Browse Quizzes
+            </a>
+        </div>
+    </div>
+
+    <!-- Join Quiz Section -->
+    <div class="mt-4">
+        <div class="glass-card text-center">
+
+            <h4 class="mb-3">Have a Quiz Code?</h4>
+
+            <form method="POST" action="{% url 'join_quiz' %}">
+                {% csrf_token %}
+
+                <div class="row justify-content-center">
+                    <div class="col-md-4">
+                        <input type="text" name="quiz_code"
+                               class="form-control text-center"
+                               placeholder="Enter Quiz Code (e.g. AB12CD)"
+                               required>
+                    </div>
+                </div>
+
+                <div class="mt-3">
+                    <button type="submit" class="btn btn-glow text-white">
+                        Join Quiz
+                    </button>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+
+</div>
+
+<script src='https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js'></script>
+<!-- Result Pop-up Modal -->
+{% if last_attempt %}
+<div class="modal fade" id="resultModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content glass-card" style="border: 1px solid #334155; color: white; background: #1E293B; border-radius: 20px;">
+            <div class="modal-header border-0">
+                <h5 class="modal-title fw-bold">?? Quiz Result</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <div style="font-size: 3.5rem; font-weight: 800; color: #60A5FA; margin-bottom: 10px;">{{ last_attempt.percentage|floatformat:0 }}%</div>
+                <h4 class="fw-bold">{{ last_attempt.quiz.title }}</h4>
+                <hr style="border-color: #475569;">
+                <div class="row mt-3">
+                    <div class="col-6 mb-3">
+                        <small style="color: #94A3B8; display: block; text-transform: uppercase; font-size: 0.75rem;">MARKS</small>
+                        <span class="fw-bold" style="font-size: 1.2rem;">{{ last_attempt.score }} / {{ last_attempt.total_marks }}</span>
+                    </div>
+                    <div class="col-6 mb-3">
+                        <small style="color: #94A3B8; display: block; text-transform: uppercase; font-size: 0.75rem;">RANK</small>
+                        <span class="fw-bold text-warning" style="font-size: 1.2rem;">#{{ last_attempt.rank }}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-0 justify-content-center pb-4">
+                <button type="button" class="btn btn-primary rounded-pill px-5 fw-bold" style="background: #2563EB; border: none; box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);" data-bs-dismiss="modal">Great!</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var myModal = new bootstrap.Modal(document.getElementById('resultModal'));
+        myModal.show();
+    });
+</script>
+{% endif %}
+</body>
+</html>
