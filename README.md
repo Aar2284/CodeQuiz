@@ -45,6 +45,7 @@
 - **Question Management:** Add multiple-choice questions with weighted marks.
 - **Unique Quiz Codes:** Automatically generate 6-digit alphanumeric codes for secure quiz access.
 - **Student Monitoring:** View all student attempts, scores, and rankings in real-time.
+- **PDF Report Generation:** Export quiz results and student performance data into professional PDF reports.
 - **Negative Marking:** Optional support for negative marking to ensure academic integrity.
 </details>
 
@@ -84,25 +85,31 @@
    source venv/bin/activate
    ```
 
-3. **Install Dependencies**
+3. **Configure Environment Variables**
    ```bash
-   pip install django pillow
+   cp .env.example .env
+   # Edit .env with your configuration
    ```
 
-4. **Database Migrations**
+4. **Install Dependencies**
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+5. **Database Migrations**
    ```bash
    python manage.py makemigrations
    python manage.py migrate
    ```
 
-5. **Create Superuser (Optional)**
+6. **Create Superuser (Optional)**
    ```bash
    python manage.py createsuperuser
    ```
 
-6. **Run Server**
+7. **Run Server**
    ```bash
-   python manage.py runServer
+   python manage.py runserver
    ```
 
 The application will be available at `http://127.0.0.1:8000`
@@ -113,11 +120,13 @@ The application will be available at `http://127.0.0.1:8000`
 
 ```text
 CodeQuiz/
-├── accounts/          # User management & Authentication
-├── quiz/              # Quiz core logic, models & views
-├── templates/         # Interactive HTML components
-├── quizz/             # Project configuration
-└── manage.py          # Django entry point
+├── accounts/          # User management, Roles & Authentication
+├── quiz/              # Quiz core logic, Models, Views & PDF Logic
+├── templates/         # UI Components & Dashboard Layouts
+├── quizz/             # Project Settings & Root Configurations
+├── manage.py          # Django management script
+├── requirements.txt   # Project dependencies
+└── .env.example       # Template for environment variables
 ```
 
 ---
