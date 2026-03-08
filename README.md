@@ -117,6 +117,9 @@ The application will be available at `http://127.0.0.1:8000`
 CodeQuiz/
 ├── accounts/          # User management, Roles & Authentication
 ├── quiz/              # Quiz core logic, Models, Views & PDF Logic
+├── static/            # Organized Static Assets
+│   ├── css/           # common.css, student.css, teacher.css, auth.css, quiz.css
+│   └── js/            # main.js (Externalized Interactivity)
 ├── templates/         # UI Components & Dashboard Layouts
 ├── quizz/             # Project Settings & Root Configurations
 ├── manage.py          # Django management script
@@ -130,9 +133,11 @@ CodeQuiz/
 
 The project features a **modern dark-themed UI** inspired by enterprise-level dashboards.
 
+*   **Optimized Layouts:** Perfectly centered and responsive Authentication (Login/Register) screens.
 *   **Color Palette:** `#0F172A` (Background), `#1E293B` (Cards), `#2563EB` (Primary Accents)
 *   **Typography:** 'Poppins', sans-serif
-*   **Interactivity:** Smooth transitions and hover effects for a premium feel.
+*   **Modular CSS:** Role-specific stylesheets (`student.css`, `teacher.css`) for a clean and maintainable codebase.
+*   **Interactivity:** Smooth transitions, glassmorphism effects, and dynamic modals.
 
 ---
 
