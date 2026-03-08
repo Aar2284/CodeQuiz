@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html>
 <head>
@@ -5,59 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-
-<style>
-body {
-    margin: 0;
-    min-height: 100vh;
-    font-family: 'Poppins', sans-serif;
-    background-color: #0F172A;
-    color: #F1F5F9;
-}
-
-.navbar-custom {
-    background-color: #1E293B;
-}
-
-.dashboard-card {
-    background: #1E293B;
-    border-radius: 14px;
-    padding: 25px;
-    box-shadow: 0 6px 20px rgba(0,0,0,0.35);
-    border: 1px solid rgba(255,255,255,0.05);
-    transition: 0.3s ease;
-}
-
-.dashboard-card:hover {
-    transform: translateY(-5px);
-}
-
-.btn-primary-custom {
-    background-color: #2563EB;
-    border: none;
-    border-radius: 30px;
-    padding: 10px 20px;
-    font-weight: 600;
-    transition: 0.3s ease;
-    color: white;
-}
-
-.btn-primary-custom:hover {
-    background-color: #1D4ED8;
-    box-shadow: 0 0 15px rgba(37, 99, 235, 0.6);
-}
-
-.stat-number {
-    font-size: 34px;
-    font-weight: 700;
-    color: #3B82F6;
-}
-
-.small-label {
-    color: #94A3B8;
-    font-size: 14px;
-}
-</style>
+    <link href="{% static 'css/teacher.css' %}" rel="stylesheet">
 </head>
 
 <body>
@@ -71,7 +20,7 @@ body {
     </div>
 </nav>
 
-<div class="container mt-5" style="max-width:1100px;">
+<div class="container mt-5 teacher-container">
 
     <!-- Title -->
     <h2 class="fw-bold mb-5">Teacher Dashboard</h2>
@@ -136,7 +85,7 @@ body {
                 <div>
                     <h5 class="mb-1">{{ quiz.title }}</h5>
                     <p class="small-label mb-1">
-                        Code: <strong>{{ quiz.quiz_code }}</strong>
+                        Code: <strong class="quiz-card-code">{{ quiz.quiz_code }}</strong>
                     </p>
                     <p class="small-label mb-0">
                         Questions: {{ quiz.questions.count }}
@@ -146,12 +95,12 @@ body {
                 <div class="d-flex gap-2 mt-3 mt-md-0">
 
                     <a href="{% url 'add_question' quiz.id %}" 
-                       class="btn btn-success btn-sm">
+                       class="btn btn-success btn-sm btn-quiz-action">
                         Add Questions
                     </a>
 
                     <a href="{% url 'view_results' %}" 
-                       class="btn btn-outline-light btn-sm">
+                       class="btn btn-outline-light btn-sm btn-quiz-action">
                         Results
                     </a>
 
@@ -169,5 +118,6 @@ body {
 
 </div>
 
+<script src='https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js'></script>
 </body>
 </html>

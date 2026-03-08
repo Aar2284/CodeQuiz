@@ -1,0 +1,57 @@
+@import url("common.css");
+
+/* Student Specific Styles */
+
+/* Result Modal Styling */
+.result-modal-content {
+    border: 1px solid #334155; 
+    color: white; 
+    background: #1E293B; 
+    border-radius: 20px;
+}
+
+.result-percentage {
+    font-size: 3.5rem; 
+    font-weight: 800; 
+    color: #60A5FA; 
+    margin-bottom: 10px;
+}
+
+.result-divider {
+    border-color: #475569;
+}
+
+.result-stat-label {
+    color: #94A3B8; 
+    display: block; 
+    text-transform: uppercase; 
+    font-size: 0.75rem;
+}
+
+.result-stat-value {
+    font-size: 1.2rem;
+}
+
+.btn-result-close {
+    background: #2563EB; 
+    border: none; 
+    box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);
+}
+
+/* Past Attempts Page */
+.attempt-card-percentage {
+    border-right: 1px solid #334155; 
+    border-left: 1px solid #334155;
+}
+
+.attempt-stat-container {
+    min-width: 150px;
+}
+
+.attempt-score-text {
+    font-size: 1.2rem;
+}
+
+.empty-state-icon {
+    font-size: 4rem;
+}

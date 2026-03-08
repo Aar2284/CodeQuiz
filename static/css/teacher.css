@@ -1,0 +1,26 @@
+@import url("common.css");
+
+/* Teacher Specific Styles */
+
+.teacher-container {
+    max-width: 1100px;
+}
+
+.quiz-card-code {
+    letter-spacing: 1px;
+}
+
+.add-question-container {
+    max-width: 700px;
+}
+
+.btn-quiz-action {
+    border-radius: 8px;
+    font-weight: 500;
+}
+
+.result-table-container {
+    background: #1E293B;
+    border-radius: 12px;
+    padding: 20px;
+}

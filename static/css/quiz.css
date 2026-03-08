@@ -1,0 +1,50 @@
+@import url("common.css");
+
+/* Quiz Related Styles */
+
+.quiz-container {
+    max-width: 800px;
+}
+
+.question-card {
+    background: #1E293B;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+    border: 1px solid rgba(255,255,255,0.05);
+}
+
+.timer-badge {
+    font-size: 1.2rem;
+    padding: 8px 15px;
+    border-radius: 30px;
+    background: #334155;
+    color: #60A5FA;
+}
+
+.option-btn {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 12px 20px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    background: #334155;
+    border: 1px solid #475569;
+    color: white;
+    transition: 0.2s;
+}
+
+.option-btn:hover {
+    background: #475569;
+}
+
+.option-btn.selected {
+    background: #2563EB;
+    border-color: #60A5FA;
+}
+
+.enter-code-card {
+    width: 400px;
+    border-radius: 20px;
+}

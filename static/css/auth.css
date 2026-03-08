@@ -1,0 +1,32 @@
+@import url("common.css");
+
+/* Auth Specific Styles (Login/Register) */
+
+/* Centering the Auth Pages */
+body.auth-page {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+    overflow: hidden; /* Prevents scrollbars on login/register */
+}
+
+.auth-card {
+    width: 420px;
+    padding: 45px;
+    background: #1E293B;
+    border-radius: 18px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+}
+
+.auth-subtitle {
+    font-size: 14px;
+    color: #94A3B8;
+}
+
+.auth-btn {
+    border-radius: 30px;
+    padding: 12px;
+    font-weight: 600;
+}
