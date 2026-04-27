@@ -6,5 +6,10 @@ class User(AbstractUser):
         ('teacher', 'Teacher'),
         ('student', 'Student'),
     )
-    role = models.CharField(max_length=10, choices=ROLE_CHOICES)
-# Create your models here.
+    role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='student')
+
+    def is_teacher(self) -> bool:
+        return self.role == 'teacher'
+
+    def is_student(self) -> bool:
+        return self.role == 'student'
