@@ -72,12 +72,42 @@ def logout_view(request):
 def teacher_dashboard(request):
     quizzes = Quiz.objects.filter(created_by=request.user)
 
-    total_quizzes = quizzes.count()
-    total_questions = Question.objects.filter(quiz__in=quizzes).count()
-    total_attempts = Attempt.objects.filter(quiz__in=quizzes).count()
     
-    published = quizzes.filter(is_published=True).count()
-    unpublished = total_quizzes - published
+    # --------- ANALYTICS CHART GENERATION ----------
+    labels = []
+    data = []
+
+    for quiz in quizzes:
+        attempts = Attempt.objects.filter(quiz=quiz)
+
+        if attempts.exists():
+            avg = sum(a.percentage for a in attempts) / attempts.count()
+            labels.append(quiz.title)
+            data.append(avg)
+
+    # Create media folder if not exists
+    if not os.path.exists(settings.MEDIA_ROOT):
+        os.makedirs(settings.MEDIA_ROOT)
+
+    chart_path = os.path.join(settings.MEDIA_ROOT, "quiz_chart.png")
+
+    # Always generate chart if quizzes exist
+    if quizzes.exists():
+        plt.figure(figsize=(6,4))
+
+        if data:
+            plt.bar(labels, data)
+        else:
+            plt.bar(["No Data"], [0])
+
+        plt.xlabel("Quizzes")
+        plt.ylabel("Average Score (%)")
+        plt.title("Quiz Performance")
+
+        plt.tight_layout()
+        plt.savefig(chart_path)
+        plt.close()
+
 
     context = {
         'total_quizzes': total_quizzes,
