@@ -51,7 +51,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'accounts',
     'quiz',
+    'analytics',
+    'reports',
 ]
+
 AUTH_USER_MODEL = 'accounts.User'
 
 MIDDLEWARE = [
