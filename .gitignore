@@ -1,9 +1,20 @@
-*.pyc
-__pycache__/
-db.sqlite3
+# Virtual Environment
+venv/
+ENV/
 /venv
 /env
-.env 
-venv/
+
+# Python cache
+__pycache__/
 *.py[cod]
+*.pyc
+
+# Database (Keep your local data private)
+db.sqlite3
+
+# Static/Media files (usually not tracked in Git)
 media/
+static/
+
+# Environment variables
+.env
