@@ -1,3 +1,4 @@
+from django.db.models import Avg
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
@@ -6,15 +7,6 @@ from django.contrib.auth import get_user_model
 from quiz.models import Option, Quiz, Question, Attempt
 
 User = get_user_model()
-
-
-def home(request):
-    if not request.user.is_authenticated:
-        return redirect('login')
-    if request.user.role == 'teacher':
-        return redirect('teacher_dashboard')
-    return redirect('student_dashboard')
-
 
 def register_view(request):
     if request.method == "POST":
@@ -68,11 +60,20 @@ def logout_view(request):
     logout(request)
     return redirect('login')
 
+import os
+import matplotlib.pyplot as plt
+from django.conf import settings
+from quiz.models import Quiz, Question, Attempt
+
 @login_required
 def teacher_dashboard(request):
+
     quizzes = Quiz.objects.filter(created_by=request.user)
 
-    
+    total_quizzes = quizzes.count()
+    total_questions = Question.objects.filter(quiz__in=quizzes).count()
+    total_attempts = Attempt.objects.filter(quiz__in=quizzes).count()
+
     # --------- ANALYTICS CHART GENERATION ----------
     labels = []
     data = []
@@ -108,19 +109,14 @@ def teacher_dashboard(request):
         plt.savefig(chart_path)
         plt.close()
 
-
     context = {
         'total_quizzes': total_quizzes,
         'total_questions': total_questions,
         'total_attempts': total_attempts,
-        'published': published,
-        'unpublished': unpublished,
         'quizzes': quizzes,
     }
 
     return render(request, 'accounts/teacher_dashboard.html', context)
-
-
 @login_required
 def view_results(request):
 
@@ -136,7 +132,6 @@ def view_results(request):
     return render(request, 'accounts/view_results.html', {
         'attempts': attempts
     })
-
 
 @login_required
 def student_dashboard(request):
@@ -168,3 +163,71 @@ def student_dashboard(request):
     }
 
     return render(request, 'accounts/student_dashboard.html', context)
+
+@login_required
+def analytics_page(request):
+
+    if request.user.role == 'student':
+        attempts = Attempt.objects.filter(student=request.user)
+        quizzes = Quiz.objects.filter(id__in=attempts.values_list('quiz', flat=True))
+    else:
+        quizzes = Quiz.objects.filter(created_by=request.user)
+        attempts = Attempt.objects.filter(quiz__in=quizzes)
+
+    total_quizzes = quizzes.count()
+    total_attempts = attempts.count()
+
+    average_score = attempts.aggregate(Avg('percentage'))['percentage__avg']
+    average_score = round(average_score, 2) if average_score else 0
+
+    # -------- Create Media Folder --------
+    if not os.path.exists(settings.MEDIA_ROOT):
+        os.makedirs(settings.MEDIA_ROOT)
+
+    # -------- BAR CHART --------
+    labels = []
+    data = []
+
+    for quiz in quizzes:
+        avg = attempts.filter(quiz=quiz).aggregate(
+            Avg('percentage')
+        )['percentage__avg']
+
+        labels.append(quiz.title)
+        data.append(round(avg, 2) if avg else 0)
+
+    bar_chart_path = os.path.join(settings.MEDIA_ROOT, f"bar_chart_{request.user.id}.png")
+
+    if quizzes.exists():
+        plt.figure(figsize=(6,4))
+        plt.bar(labels if labels else ["No Data"],
+                data if data else [0])
+        plt.xlabel("Quizzes")
+        plt.ylabel("Average Score (%)")
+        plt.title("Quiz Performance")
+        plt.tight_layout()
+        plt.savefig(bar_chart_path)
+        plt.close()
+
+    # -------- PIE CHART --------
+    pass_count = attempts.filter(percentage__gte=40).count()
+    fail_count = attempts.filter(percentage__lt=40).count()
+
+    pie_chart_path = os.path.join(settings.MEDIA_ROOT, f"pie_chart_{request.user.id}.png")
+
+    if total_attempts > 0:
+        plt.figure(figsize=(5,5))
+        plt.pie([pass_count, fail_count],
+                labels=["Pass", "Fail"],
+                autopct="%1.1f%%")
+        plt.title("Pass vs Fail Distribution")
+        plt.savefig(pie_chart_path)
+        plt.close()
+
+    context = {
+        "total_quizzes": total_quizzes,
+        "total_attempts": total_attempts,
+        "average_score": average_score,
+    }
+
+    return render(request, "accounts/analytics.html", context)
