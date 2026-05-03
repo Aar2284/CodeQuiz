@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Teacher Analytics Dashboard - Coding MCQ</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <!-- Bootstrap & Google Fonts -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: 'Outfit', sans-serif;
+            background-color: #060B18;
+            color: #F1F5F9;
+        }
+
+        .navbar-custom {
+            background-color: #111827;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .dashboard-card {
+            background: #111827;
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+            border-color: rgba(59, 130, 246, 0.2);
+        }
+
+        .btn-primary-custom {
+            background: linear-gradient(135deg, #6366F1 0%, #4F46E5 100%);
+            border: none;
+            border-radius: 30px;
+            padding: 10px 24px;
+            font-weight: 600;
+            color: white;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+        }
+
+        .btn-primary-custom:hover {
+            background: linear-gradient(135deg, #3B82F6 0%, #6366F1 100%);
+            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+            transform: translateY(-1px);
+        }
+
+        .btn-outline-custom {
+            border: 1.5px solid #374151;
+            color: #F1F5F9;
+            border-radius: 30px;
+            padding: 10px 24px;
+            font-weight: 600;
+            background: transparent;
+            transition: all 0.3s ease;
+        }
+
+        .btn-outline-custom:hover {
+            border-color: #F1F5F9;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .stat-number {
+            font-size: 38px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #60A5FA 0%, #3B82F6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .small-label {
+            color: #94A3B8;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 320px;
+            width: 100%;
+        }
+
+        .dropdown-custom {
+            background-color: #111827;
+            border: 1.5px solid #374151;
+            color: #F1F5F9;
+            border-radius: 12px;
+            padding: 10px 16px;
+            font-weight: 500;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .dropdown-custom:focus {
+            border-color: #3B82F6;
+        }
+
+        .leaderboard-table th {
+            color: #94A3B8;
+            font-weight: 600;
+            border-bottom: 2px solid #1F2937 !important;
+        }
+
+        .leaderboard-table td {
+            vertical-align: middle;
+            border-bottom: 1px solid #1F2937 !important;
+        }
+
+        .badge-rank {
+            width: 28px;
+            height: 28px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-weight: 700;
+        }
+
+        .badge-1 { background-color: #F59E0B; color: #111827; }
+        .badge-2 { background-color: #94A3B8; color: #111827; }
+        .badge-3 { background-color: #B45309; color: #FFFFFF; }
+        .badge-other { background-color: #374151; color: #F1F5F9; }
+    </style>
+</head>
+
+<body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark navbar-custom px-4">
+    <div class="container-fluid">
+        <a class="navbar-brand fw-extrabold fs-4" href="{% url 'teacher_dashboard' %}" style="letter-spacing: -0.5px;">
+            <span style="color: #3B82F6;">Coding</span> Quiz
+        </a>
+        <div class="ms-auto d-flex align-items-center gap-3">
+            <span class="small-label d-none d-sm-inline">Logged in as: <strong>{{ request.user.username }}</strong></span>
+            <a href="{% url 'teacher_dashboard' %}" class="btn btn-outline-custom btn-sm">Dashboard</a>
+            <a href="{% url 'logout' %}" class="btn btn-primary-custom btn-sm">Logout</a>
+        </div>
+    </div>
+</nav>
+
+<div class="container my-5" style="max-width: 1200px;">
+
+    <!-- Heading & Filter -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-5">
+        <div>
+            <h1 class="fw-extrabold mb-1" style="letter-spacing: -1px;">Analytics Dashboard</h1>
+            <p class="small-label mb-0">Visualize student progress, quiz metrics, and top performances.</p>
+        </div>
+
+        <!-- Quiz Filtering Dropdown -->
+        <form method="GET" class="d-flex align-items-center gap-2">
+            <label for="quiz_id" class="small-label me-2">Filter Leaderboard:</label>
+            <select name="quiz_id" id="quiz_id" class="dropdown-custom" onchange="this.form.submit()">
+                <option value="">-- All Quizzes Combined --</option>
+                {% for quiz in quizzes %}
+                    <option value="{{ quiz.id }}" {% if selected_quiz.id == quiz.id %}selected{% endif %}>
+                        {{ quiz.title }}
+                    </option>
+                {% endfor %}
+            </select>
+        </form>
+    </div>
+
+    <!-- Quick Stats Row -->
+    <div class="row g-4 mb-5">
+        <div class="col-md-3 col-sm-6">
+            <div class="dashboard-card text-center">
+                <p class="small-label mb-2">Total Quizzes Created</p>
+                <div class="stat-number">{{ total_quizzes }}</div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="dashboard-card text-center">
+                <p class="small-label mb-2">Total Student Attempts</p>
+                <div class="stat-number">{{ total_attempts }}</div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="dashboard-card text-center">
+                <p class="small-label mb-2">Average Score Percentage</p>
+                <div class="stat-number">{{ average_score }}%</div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="dashboard-card text-center">
+                <p class="small-label mb-2">Most Attempted Quiz</p>
+                <div class="stat-number fs-5 text-truncate py-2" style="font-weight: 700; color: #10B981; -webkit-text-fill-color: initial;">
+                    {% if most_attempted_quiz %}{{ most_attempted_quiz.title }}{% else %}N/A{% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Row 1: Charts -->
+    <div class="row g-4 mb-5">
+        <!-- Top 5 Student Results Bar Chart -->
+        <div class="col-lg-6">
+            <div class="dashboard-card h-100">
+                <h5 class="fw-bold mb-1">Top 5 Student Results Leaderboard</h5>
+                <p class="small-label mb-4">Highest individual attempt percentages {% if selected_quiz %}for <strong>{{ selected_quiz.title }}</strong>{% else %}(All Quizzes){% endif %}.</p>
+                
+                <div class="chart-container">
+                    <canvas id="topAttemptsChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Consistent Performers Horizontal Chart -->
+        <div class="col-lg-6">
+            <div class="dashboard-card h-100">
+                <h5 class="fw-bold mb-1">Top 5 Consistent Students</h5>
+                <p class="small-label mb-4">Students with highest average percentages across all their attempts.</p>
+                
+                <div class="chart-container">
+                    <canvas id="topStudentsAvgChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Row 2: Quiz Statistics & Data Table -->
+    <div class="row g-4">
+        <!-- Quiz Averages Doughnut / Polar Chart -->
+        <div class="col-lg-5">
+            <div class="dashboard-card h-100">
+                <h5 class="fw-bold mb-1">Quiz Average Performance</h5>
+                <p class="small-label mb-4">Average scores compared across all created quizzes.</p>
+                
+                <div class="chart-container">
+                    <canvas id="quizAveragesChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Leaderboard Table Details -->
+        <div class="col-lg-7">
+            <div class="dashboard-card h-100">
+                <h5 class="fw-bold mb-1">Leaderboard Details</h5>
+                <p class="small-label mb-4">Detailed records of the top scoring attempts currently selected.</p>
+                
+                <div class="table-responsive">
+                    <table class="table table-dark leaderboard-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 70px;">Rank</th>
+                                <th>Student</th>
+                                <th>Quiz Name</th>
+                                <th class="text-end">Raw Score</th>
+                                <th class="text-end">Percentage</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for attempt in top_attempts %}
+                                <tr>
+                                    <td>
+                                        {% if forloop.counter == 1 %}
+                                            <span class="badge-rank badge-1">1</span>
+                                        {% elif forloop.counter == 2 %}
+                                            <span class="badge-rank badge-2">2</span>
+                                        {% elif forloop.counter == 3 %}
+                                            <span class="badge-rank badge-3">3</span>
+                                        {% else %}
+                                            <span class="badge-rank badge-other">{{ forloop.counter }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="fw-bold">{{ attempt.student.username }}</td>
+                                    <td>{{ attempt.quiz.title }}</td>
+                                    <td class="text-end text-info fw-semibold">{{ attempt.score }} / {{ attempt.total_marks }}</td>
+                                    <td class="text-end text-success fw-bold">{{ attempt.percentage }}%</td>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="5" class="text-center py-4 text-muted">No student attempts recorded yet.</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Interactive Chart Scripts -->
+<script>
+    // Set up Chart.js defaults for gorgeous dark theme styling
+    Chart.defaults.color = '#94A3B8';
+    Chart.defaults.font.family = "'Outfit', sans-serif";
+    Chart.defaults.font.weight = 500;
+    Chart.defaults.plugins.tooltip.padding = 12;
+    Chart.defaults.plugins.tooltip.cornerRadius = 8;
+    Chart.defaults.plugins.tooltip.backgroundColor = '#060B18';
+    Chart.defaults.plugins.tooltip.borderColor = 'rgba(255, 255, 255, 0.1)';
+    Chart.defaults.plugins.tooltip.borderWidth = 1;
+
+    // 1. TOP ATTEMPTS CHART
+    const topAttemptsData = [
+        {% for attempt in top_attempts %}
+        {
+            student: "{{ attempt.student.username|escapejs }}",
+            quiz: "{{ attempt.quiz.title|escapejs }}",
+            percentage: {{ attempt.percentage }}
+        },
+        {% endfor %}
+    ];
+
+    const ctxAttempts = document.getElementById('topAttemptsChart').getContext('2d');
+    
+    // Create soft indigo-blue gradient
+    const gradientAttempts = ctxAttempts.createLinearGradient(0, 0, 0, 300);
+    gradientAttempts.addColorStop(0, '#3B82F6');
+    gradientAttempts.addColorStop(1, '#8B5CF6');
+
+    new Chart(ctxAttempts, {
+        type: 'bar',
+        data: {
+            labels: topAttemptsData.map((d, i) => `#${i+1} ${d.student}`),
+            datasets: [{
+                label: 'Score Percentage',
+                data: topAttemptsData.map(d => d.percentage),
+                backgroundColor: gradientAttempts,
+                borderRadius: 8,
+                borderSkipped: false,
+                barThickness: 32,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        title: function(context) {
+                            const index = context[0].dataIndex;
+                            return `Student: ${topAttemptsData[index].student}`;
+                        },
+                        label: function(context) {
+                            const index = context.dataIndex;
+                            return [
+                                `Percentage: ${context.parsed.y}%`,
+                                `Quiz: ${topAttemptsData[index].quiz}`
+                            ];
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    min: 0,
+                    max: 100,
+                    grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                    ticks: { callback: value => `${value}%` }
+                },
+                x: {
+                    grid: { display: false }
+                }
+            }
+        }
+    });
+
+    // 2. TOP STUDENTS AVERAGE CHART
+    const topStudentsAvgData = [
+        {% for student in top_students_avg %}
+        {
+            student: "{{ student.student__username|escapejs }}",
+            avgPercentage: {{ student.avg_percentage|floatformat:1 }}
+        },
+        {% endfor %}
+    ];
+
+    const ctxAvg = document.getElementById('topStudentsAvgChart').getContext('2d');
+    
+    // Create emerald gradient
+    const gradientAvg = ctxAvg.createLinearGradient(0, 0, 400, 0);
+    gradientAvg.addColorStop(0, '#10B981');
+    gradientAvg.addColorStop(1, '#059669');
+
+    new Chart(ctxAvg, {
+        type: 'bar',
+        data: {
+            labels: topStudentsAvgData.map(d => d.student),
+            datasets: [{
+                label: 'Average Score',
+                data: topStudentsAvgData.map(d => d.avgPercentage),
+                backgroundColor: gradientAvg,
+                borderRadius: 8,
+                borderSkipped: false,
+                barThickness: 24,
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: context => `Overall Avg: ${context.parsed.x}%`
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    min: 0,
+                    max: 100,
+                    grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                    ticks: { callback: value => `${value}%` }
+                },
+                y: {
+                    grid: { display: false }
+                }
+            }
+        }
+    });
+
+    // 3. QUIZ AVERAGES CHART
+    const quizStatsData = [
+        {% for stat in quiz_stats %}
+        {
+            title: "{{ stat.title|escapejs }}",
+            avgPercentage: {{ stat.avg_percentage }},
+            attempts: {{ stat.attempts_count }}
+        },
+        {% endfor %}
+    ];
+
+    const ctxQuiz = document.getElementById('quizAveragesChart').getContext('2d');
+    
+    // Standard beautiful colors for Doughnut
+    const chartColors = [
+        '#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#EC4899', 
+        '#8B5CF6', '#14B8A6', '#F43F5E', '#06B6D4', '#84CC16'
+    ];
+
+    new Chart(ctxQuiz, {
+        type: 'doughnut',
+        data: {
+            labels: quizStatsData.map(d => d.title),
+            datasets: [{
+                data: quizStatsData.map(d => d.avgPercentage),
+                backgroundColor: chartColors.slice(0, quizStatsData.length),
+                borderColor: '#111827',
+                borderWidth: 2,
+                hoverOffset: 12
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        boxWidth: 12,
+                        padding: 15,
+                        font: { size: 12 }
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const index = context.dataIndex;
+                            return [
+                                `Average Score: ${context.parsed}%`,
+                                `Total Attempts: ${quizStatsData[index].attempts}`
+                            ];
+                        }
+                    }
+                }
+            },
+            cutout: '65%'
+        }
+    });
+</script>
+
+</body>
+</html>
