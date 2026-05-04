@@ -179,7 +179,7 @@ def attempt_quiz(request, quiz_id):
             attempt_obj.rank = index + 1
             attempt_obj.save()
 
-        return redirect('view_result', attempt_id=attempt.id)
+        return redirect(f'/student/?show_result={attempt.id}')
 
     return render(request, 'attempt_quiz.html', {
         'quiz': quiz,
