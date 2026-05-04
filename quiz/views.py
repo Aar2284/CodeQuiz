@@ -139,6 +139,11 @@ def enter_quiz_code(request):
 @login_required
 def attempt_quiz(request, quiz_id):
     quiz = get_object_or_404(Quiz, id=quiz_id)
+    
+    if Attempt.objects.filter(quiz=quiz, student=request.user).exists():
+        messages.error(request, 'You have already attempted this quiz.')
+        return redirect('student_dashboard')
+
     questions = Question.objects.filter(quiz=quiz)
 
     if request.method == "POST":
