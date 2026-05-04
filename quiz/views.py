@@ -24,6 +24,7 @@ def create_quiz(request):
         if form.is_valid():
             quiz = form.save(commit=False) 
             quiz.created_by = request.user 
+            quiz.is_published = True  # Automatically publish on creation for ease of use
             quiz.save() # quiz_code generated in model save()
             return redirect('add_question', quiz_id=quiz.id)
     else:
