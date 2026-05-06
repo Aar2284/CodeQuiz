@@ -1,167 +1,93 @@
-# 📝 CodeQuiz - Advanced Quiz Management System
+# Web-Based Assessment System with Role-Based Access Control
 
-<div align="center">
-
-  <img src="https://img.shields.io/badge/CodeQuiz-1A3766?style=for-the-badge&logo=codeforces&logoColor=white" alt="Logo" />
-  
-
-  <p align="center">
-    A robust, role-based quiz platform built with Django, featuring automated grading, real-time timers, and performance analytics.
-    <br />
-    <a href="#-key-features"><strong>Explore the features »</strong></a>
-    <br />
-  </p>
-</div>
-
----
-
-## 🚀 Tech Stack
-
-### 🌐 Languages Used
-![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)
-![HTML5](https://img.shields.io/badge/html5-%23E34F26.svg?style=for-the-badge&logo=html5&logoColor=white)
-![CSS3](https://img.shields.io/badge/css3-%231572B6.svg?style=for-the-badge&logo=css3&logoColor=white)
-![JavaScript](https://img.shields.io/badge/javascript-%23F7DF1E.svg?style=for-the-badge&logo=javascript&logoColor=black)
-
-### ⚙️ Frameworks & Libraries
 ![Django](https://img.shields.io/badge/django-%23092E20.svg?style=for-the-badge&logo=django&logoColor=white)
-![Bootstrap](https://img.shields.io/badge/bootstrap-%238511FA.svg?style=for-the-badge&logo=bootstrap&logoColor=white)
+![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)
 ![SQLite](https://img.shields.io/badge/sqlite-%2307405e.svg?style=for-the-badge&logo=sqlite&logoColor=white)
 
----
+A comprehensive, full-stack assessment platform built with Django. This application allows educational institutions or organizations to create dynamic quizzes, evaluate users, and view detailed analytics, all managed securely through Role-Based Access Control (RBAC).
 
-## ✨ Key Features
+## ✨ Features
 
-<details>
-<summary><b>👨‍🏫 For Teachers</b> (Click to expand)</summary>
-<br>
+* **Role-Based Access Control (RBAC):** Distinct interfaces and permissions for different user types (e.g., Administrators, Instructors, and Students).
+* **Dynamic Quiz Creation:** Instructors can easily build and manage quizzes.
+* **Automated Scoring:** Instant grading and feedback for users upon quiz completion.
+* **Analytics & Reporting:** Built-in tools (`analytics` and `reports` apps) to track student progress, average scores, and overall performance.
+* **Secure Authentication:** Robust user authentication system to ensure data privacy.
 
-- **Dynamic Quiz Creation:** Create quizzes with titles, descriptions, and custom timers.
-- **Question Management:** Add multiple-choice questions with weighted marks.
-- **Unique Quiz Codes:** Automatically generate 6-digit alphanumeric codes for secure quiz access.
-- **Student Monitoring:** View all student attempts, scores, and rankings in real-time.
-- **PDF Report Generation:** Export quiz results and student performance data into professional PDF reports.
-- **Negative Marking:** Optional support for negative marking to ensure academic integrity.
-</details>
+## 📸 Screenshots
 
-<details>
-<summary><b>👨‍🎓 For Students</b> (Click to expand)</summary>
-<br>
+### Teacher Dashboard
+![Teacher Dashboard](ScreenShots/teacher_dashboard.png)
 
-- **Seamless Access:** Join any quiz instantly using a unique access code.
-- **Timed Environment:** Real-time countdown timers to simulate exam conditions.
-- **Instant Grading:** Get immediate feedback and results after submission.
-- **Performance Analytics:** View percentages, total marks, and global rankings.
-- **History Tracking:** Access past attempts and review performance trends.
-</details>
+### Create Quiz Interface
+![Create Quiz](ScreenShots/teacher_create_quiz.png)
 
----
+### Student Dashboard
+![Student Dashboard](ScreenShots/student_dashboard.png)
 
-## 🛠️ Installation & Setup
+### Analytics Dashboard
+![Analytics Dashboard](ScreenShots/teacher_analytics.png)
 
-### 📋 Prerequisites
-* Python 3.10+
-* pip (Python Package Manager)
+## 🛠️ Tech Stack
 
-### ⚙️ Quick Start
+* **Backend:** Python, Django 6
+* **Database:** SQLite (default for development)
+* **Frontend:** HTML, CSS, JavaScript (Django Templates)
 
-1. **Clone the Repository**
+## 🚀 How to Run Locally
+
+Follow these steps to run this project on your local machine.
+
+### Prerequisites
+* Python 3 installed on your machine
+* `pip` (Python package installer)
+
+### Installation
+
+1. **Clone the repository:**
    ```bash
-   git clone https://github.com/yourusername/CodeQuiz.git
-   cd CodeQuiz
+   git clone https://github.com/15Pratham/Web-Based-Assessment-System-with-Role-Based-Access-Control-.git
+   cd Web-Based-Assessment-System-with-Role-Based-Access-Control-
    ```
 
-2. **Setup Virtual Environment**
+2. **Create a virtual environment (recommended):**
    ```bash
    python -m venv venv
-   # Windows
-   .\venv\Scripts\activate
-   # Linux/Mac
+   
+   # On Windows:
+   venv\Scripts\activate
+   # On macOS/Linux:
    source venv/bin/activate
    ```
 
-3. **Configure Environment Variables**
+3. **Install dependencies:**
+   *(Note: Generate a `requirements.txt` file using `pip freeze > requirements.txt` if not already present)*
    ```bash
-   cp .env.example .env
-   # Edit .env with your configuration
+   pip install django
+   # Or if requirements.txt exists:
+   # pip install -r requirements.txt
    ```
 
-4. **Install Dependencies**
+4. **Run Database Migrations:**
    ```bash
-   pip install -r requirements.txt
-   ```
-
-5. **Database Migrations**
-   ```bash
-   python manage.py makemigrations
    python manage.py migrate
    ```
 
-6. **Create Superuser (Optional)**
+5. **Create a Superuser (Admin account):**
    ```bash
    python manage.py createsuperuser
    ```
 
-7. **Run Server**
+6. **Start the Development Server:**
    ```bash
    python manage.py runserver
    ```
 
-The application will be available at `http://127.0.0.1:8000`
-
----
-
-## 📂 Project Structure
-
-```text
-CodeQuiz/
-├── accounts/          # User management, Roles & Authentication
-├── quiz/              # Quiz core logic, Models, Views & PDF Logic
-├── static/            # Organized Static Assets
-│   ├── css/           # common.css, student.css, teacher.css, auth.css, quiz.css
-│   └── js/            # main.js (Externalized Interactivity)
-├── templates/         # UI Components & Dashboard Layouts
-├── quizz/             # Project Settings & Root Configurations
-├── manage.py          # Django management script
-├── requirements.txt   # Project dependencies
-└── .env.example       # Template for environment variables
-```
-
----
-
-## 🎨 UI & Aesthetics
-
-The project features a **modern dark-themed UI** inspired by enterprise-level dashboards.
-
-*   **Optimized Layouts:** Perfectly centered and responsive Authentication (Login/Register) screens.
-*   **Color Palette:** `#0F172A` (Background), `#1E293B` (Cards), `#2563EB` (Primary Accents)
-*   **Typography:** 'Poppins', sans-serif
-*   **Modular CSS:** Role-specific stylesheets (`student.css`, `teacher.css`) for a clean and maintainable codebase.
-*   **Interactivity:** Smooth transitions, glassmorphism effects, and dynamic modals.
-
----
+7. **Access the Application:**
+   Open your browser and navigate to `http://127.0.0.1:8000/`
 
 ## 🤝 Contributing
+Contributions, issues, and feature requests are welcome!
 
-Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
-
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
----
-
-## 📄 License
-
-Distributed under the MIT License. See `LICENSE` for more information.
-
----
-
-<div align="center">
-  <p>Made with ❤️ by Aaryan</p>
-  <a href="https://github.com/yourusername">
-    <img src="https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white" />
-  </a>
-</div>
+## 📝 License
+This project is open-source and available under the MIT License.
