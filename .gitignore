@@ -1,13 +1,10 @@
 # Virtual Environment
 venv/
 ENV/
-/venv
-/env
 
 # Python cache
 __pycache__/
 *.py[cod]
-*.pyc
 
 # Database (Keep your local data private)
 db.sqlite3
