@@ -6,7 +6,7 @@ Write-Host ""
 
 # Step 1: Install all required packages
 Write-Host "[1/3] Installing required packages..." -ForegroundColor Yellow
-python3 -m pip install django reportlab matplotlib python-dotenv --quiet
+python3 -m pip install django reportlab --quiet
 if ($LASTEXITCODE -ne 0) {
     Write-Host "ERROR: Failed to install packages. Make sure Python 3 is installed." -ForegroundColor Red
     pause
