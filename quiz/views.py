@@ -25,7 +25,7 @@ def create_quiz(request):
             quiz = form.save(commit=False) 
             quiz.created_by = request.user 
             quiz.is_published = True  # Automatically publish on creation for ease of use
-            quiz.save() # quiz_code generated in model save()
+            quiz.save() 
             return redirect('add_question', quiz_id=quiz.id)
     else:
         form = QuizForm()
@@ -126,7 +126,7 @@ def enter_quiz_code(request):
         return redirect('login')
 
     if request.method == "POST":
-        code = request.POST.get('quiz_code')
+        code = request.POST.get('quiz_code', '').upper()
         quiz = Quiz.objects.filter(quiz_code=code, is_published=True).first()
 
         if quiz:
@@ -182,7 +182,7 @@ def attempt_quiz(request, quiz_id):
 
         return redirect(f'/student/?show_result={attempt.id}')
 
-    return render(request, 'attempt_quiz.html', {
+    return render(request, 'take_quiz.html', {
         'quiz': quiz,
         'questions': questions
     })
@@ -204,18 +204,20 @@ def past_attempts(request):
 @login_required
 def available_quizzes(request):
     quizzes = Quiz.objects.filter(is_published=True)
+    attempted_quiz_ids = Attempt.objects.filter(student=request.user).values_list('quiz_id', flat=True)
     return render(request, 'available_quizzes.html', {
-        'quizzes': quizzes
+        'quizzes': quizzes,
+        'attempted_quiz_ids': attempted_quiz_ids
     })
 
 @login_required
 def join_quiz(request):
     if request.method == "POST":
-        quiz_id = request.POST.get("quiz_id")
+        code = request.POST.get("quiz_code", "").strip().upper()
         try:
-            quiz = Quiz.objects.get(id=quiz_id, is_published=True)
+            quiz = Quiz.objects.get(quiz_code=code, is_published=True)
             return redirect('attempt_quiz', quiz_id=quiz.id)
         except Quiz.DoesNotExist:
-            messages.error(request, "Invalid Quiz ID or Quiz not published.")
+            messages.error(request, f"Invalid or Unpublished Quiz Code: {code}")
             return redirect('student_dashboard')
     return redirect('student_dashboard')
