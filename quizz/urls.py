@@ -1,10 +1,19 @@
 from django.contrib import admin
 from django.urls import path, include
-from accounts import views as account_views
+from django.shortcuts import redirect
+from django.conf import settings
+from django.conf.urls.static import static
+
+def home(request):
+    return redirect('login')
 
 urlpatterns = [
+    path('', home, name='home'),
     path('admin/', admin.site.urls),
-    path('', account_views.home, name='home'),
     path('', include('accounts.urls')),
     path('', include('quiz.urls')),
+    path('analytics/', include('analytics.urls')),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
