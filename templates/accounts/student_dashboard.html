@@ -1,138 +1,857 @@
-{% load static %}
+
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Dashboard - Enterprise Quiz System</title>
+    <meta charset="UTF-8">
+    <title>Student Dashboard — Coding MCQ</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
+    <meta name="description" content="Student Dashboard for Coding MCQ System">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="{% static 'css/student.css' %}" rel="stylesheet">
-</head>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        :root {
+            --bg-primary: #060B18;
+            --bg-secondary: #0D1526;
+            --bg-card: #111827;
+            --bg-card-hover: #1a2538;
+            --border: rgba(255,255,255,0.06);
+            --accent: #6366F1;
+            --accent-glow: rgba(99,102,241,0.35);
+            --accent2: #06B6D4;
+            --accent3: #10B981;
+            --accent4: #F59E0B;
+            --text-primary: #F1F5F9;
+            --text-secondary: #94A3B8;
+            --text-muted: #374151;
+            --sidebar-w: 260px;
+        }
 
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            overflow-x: hidden;
+        }
+
+        /* ========== SIDEBAR ========== */
+        .sidebar {
+            width: var(--sidebar-w);
+            min-height: 100vh;
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 0; left: 0; bottom: 0;
+            z-index: 100;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-brand {
+            padding: 28px 24px 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .sidebar-brand .brand-name {
+            font-size: 1.2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #6366F1, #06B6D4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.3px;
+        }
+
+        .sidebar-brand .brand-sub {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            font-weight: 500;
+            margin-top: 2px;
+        }
+
+        .sidebar-user {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .avatar {
+            width: 42px; height: 42px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #6366F1, #8B5CF6);
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: 1rem; color: white;
+            flex-shrink: 0;
+        }
+
+        .user-info .user-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--text-primary);
+        }
+
+        .user-info .user-role {
+            font-size: 0.72rem;
+            color: var(--accent2);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .sidebar-nav {
+            padding: 16px 12px;
+            flex: 1;
+        }
+
+        .nav-label {
+            font-size: 0.67rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 8px 12px 6px;
+        }
+
+        .nav-item-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 14px;
+            border-radius: 10px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            margin-bottom: 2px;
+        }
+
+        .nav-item-link i { font-size: 1rem; width: 20px; text-align: center; }
+
+        .nav-item-link:hover {
+            background: rgba(99,102,241,0.1);
+            color: var(--text-primary);
+        }
+
+        .nav-item-link.active {
+            background: linear-gradient(135deg, rgba(99,102,241,0.2), rgba(6,182,212,0.1));
+            color: var(--accent);
+            border: 1px solid rgba(99,102,241,0.2);
+        }
+
+        .sidebar-footer {
+            padding: 16px 12px;
+            border-top: 1px solid var(--border);
+        }
+
+        .logout-btn {
+            display: flex; align-items: center; gap: 12px;
+            padding: 11px 14px;
+            border-radius: 10px;
+            color: #F87171;
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            width: 100%;
+        }
+
+        .logout-btn:hover { background: rgba(248,113,113,0.1); color: #FCA5A5; }
+
+        /* ========== MAIN CONTENT ========== */
+        .main-content {
+            margin-left: var(--sidebar-w);
+            flex: 1;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ========== TOPBAR ========== */
+        .topbar {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            padding: 16px 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky; top: 0; z-index: 50;
+        }
+
+        .topbar-title { font-weight: 700; font-size: 1.2rem; }
+        .topbar-subtitle { font-size: 0.8rem; color: var(--text-secondary); }
+
+        .topbar-actions { display: flex; align-items: center; gap: 12px; }
+
+        .mobile-toggle {
+            display: none;
+            background: none; border: none; color: var(--text-primary);
+            font-size: 1.3rem; cursor: pointer; padding: 6px;
+        }
+
+        /* ========== PAGE CONTENT ========== */
+        .page-content { padding: 32px; flex: 1; }
+
+        /* ========== STAT CARDS ========== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 28px;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute; top: 0; left: 0; right: 0;
+            height: 3px;
+        }
+
+        .stat-card.c1::before { background: linear-gradient(90deg, #6366F1, #8B5CF6); }
+        .stat-card.c2::before { background: linear-gradient(90deg, #06B6D4, #0EA5E9); }
+        .stat-card.c3::before { background: linear-gradient(90deg, #10B981, #059669); }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 16px 40px rgba(0,0,0,0.4);
+        }
+
+        .stat-icon {
+            width: 48px; height: 48px; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.4rem; margin-bottom: 16px;
+        }
+
+        .stat-card.c1 .stat-icon { background: rgba(99,102,241,0.15); color: #6366F1; }
+        .stat-card.c2 .stat-icon { background: rgba(6,182,212,0.15); color: #06B6D4; }
+        .stat-card.c3 .stat-icon { background: rgba(16,185,129,0.15); color: #10B981; }
+
+        .stat-value {
+            font-size: 2.2rem; font-weight: 800;
+            letter-spacing: -1px;
+            line-height: 1;
+            margin-bottom: 6px;
+        }
+
+        .stat-card.c1 .stat-value { color: #818CF8; }
+        .stat-card.c2 .stat-value { color: #22D3EE; }
+        .stat-card.c3 .stat-value { color: #34D399; }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .stat-badge {
+            position: absolute; top: 20px; right: 20px;
+            font-size: 0.68rem; font-weight: 600;
+            padding: 3px 10px; border-radius: 20px;
+        }
+
+        /* ========== CONTENT GRID ========== */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 340px;
+            gap: 24px;
+            margin-bottom: 28px;
+        }
+
+        /* ========== PANEL CARDS ========== */
+        .panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .panel-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: space-between;
+        }
+
+        .panel-title {
+            font-size: 0.95rem; font-weight: 700;
+            display: flex; align-items: center; gap: 8px;
+        }
+
+        .panel-title i { color: var(--accent); }
+
+        .panel-body { padding: 24px; }
+
+        /* ========== QUIZ CODE FORM ========== */
+        .code-input-wrapper {
+            display: flex; gap: 10px; margin-top: 16px;
+        }
+
+        .code-input {
+            flex: 1;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 12px 16px;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            font-family: 'Inter', monospace;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            transition: border-color 0.2s;
+        }
+
+        .code-input::placeholder { letter-spacing: 1px; color: var(--text-muted); text-transform: none; }
+        .code-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+
+        .btn-accent {
+            background: linear-gradient(135deg, #6366F1, #8B5CF6);
+            border: none; border-radius: 12px;
+            padding: 12px 20px; color: white;
+            font-weight: 600; font-size: 0.875rem;
+            cursor: pointer; transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .btn-accent:hover { opacity: 0.88; box-shadow: 0 6px 20px var(--accent-glow); transform: translateY(-1px); }
+
+        .btn-outline-accent {
+            background: transparent;
+            border: 1px solid rgba(99,102,241,0.4);
+            border-radius: 12px; padding: 11px 20px;
+            color: var(--accent); font-weight: 600;
+            font-size: 0.875rem; cursor: pointer;
+            transition: all 0.2s ease; text-decoration: none;
+            display: inline-flex; align-items: center; gap: 6px;
+        }
+
+        .btn-outline-accent:hover {
+            background: rgba(99,102,241,0.1);
+            color: var(--text-primary); border-color: var(--accent);
+        }
+
+        /* ========== PERFORMANCE CHART ========== */
+        .chart-container {
+            position: relative; height: 220px;
+        }
+
+        /* ========== QUICK ACTION CARDS ========== */
+        .action-grid {
+            display: grid; grid-template-columns: 1fr 1fr;
+            gap: 12px; margin-bottom: 28px;
+        }
+
+        .action-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 14px; padding: 20px;
+            text-decoration: none; color: var(--text-primary);
+            transition: all 0.2s ease;
+            display: flex; align-items: center; gap: 14px;
+        }
+
+        .action-card:hover {
+            transform: translateY(-3px);
+            border-color: rgba(99,102,241,0.3);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+            color: var(--text-primary);
+        }
+
+        .action-icon {
+            width: 44px; height: 44px; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.2rem; flex-shrink: 0;
+        }
+
+        .action-text .action-title { font-weight: 600; font-size: 0.9rem; }
+        .action-text .action-desc { font-size: 0.75rem; color: var(--text-secondary); margin-top: 2px; }
+
+        /* ========== PROGRESS BARS ========== */
+        .progress-item { margin-bottom: 16px; }
+        .progress-label {
+            display: flex; justify-content: space-between;
+            font-size: 0.8rem; margin-bottom: 6px;
+        }
+        .progress-label span:first-child { color: var(--text-secondary); font-weight: 500; }
+        .progress-label span:last-child { color: var(--text-primary); font-weight: 600; }
+
+        .progress-bar-bg {
+            height: 6px; background: rgba(255,255,255,0.06);
+            border-radius: 99px; overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%; border-radius: 99px;
+            width: var(--fill-width, 0%);
+            transition: width 1s ease;
+        }
+
+        /* ========== ALERTS ========== */
+        .alert-custom {
+            background: rgba(239,68,68,0.1);
+            border: 1px solid rgba(239,68,68,0.2);
+            border-radius: 12px; padding: 12px 16px;
+            color: #FCA5A5; font-size: 0.875rem;
+            margin-bottom: 16px;
+            display: flex; align-items: center; gap: 10px;
+        }
+
+        /* ========== MODAL ========== */
+        .modal-content {
+            background: #111827;
+            border: 1px solid var(--border);
+            border-radius: 20px; color: white;
+        }
+
+        .score-ring {
+            width: 130px; height: 130px;
+            border-radius: 50%; margin: 0 auto 20px;
+            background: conic-gradient(#6366F1 var(--pct), rgba(255,255,255,0.06) 0deg);
+            display: flex; align-items: center; justify-content: center;
+            position: relative;
+        }
+
+        .score-ring::before {
+            content: ''; position: absolute;
+            inset: 12px; border-radius: 50%;
+            background: #111827;
+        }
+
+        .score-ring-text {
+            position: relative; z-index: 1;
+            font-size: 1.6rem; font-weight: 800; color: #818CF8;
+        }
+
+        /* ========== RESPONSIVE ========== */
+        @media (max-width: 1024px) {
+            .content-grid { grid-template-columns: 1fr; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.open { transform: translateX(0); }
+            .main-content { margin-left: 0; }
+            .mobile-toggle { display: block; }
+            .stats-grid { grid-template-columns: 1fr; }
+            .action-grid { grid-template-columns: 1fr; }
+            .page-content { padding: 20px; }
+        }
+
+        /* Animate on load */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .stat-card, .panel, .action-card {
+            animation: fadeUp 0.4s ease both;
+        }
+
+        .stat-card:nth-child(1) { animation-delay: 0.05s; }
+        .stat-card:nth-child(2) { animation-delay: 0.1s; }
+        .stat-card:nth-child(3) { animation-delay: 0.15s; }
+    </style>
+</head>
 <body>
 
-<!-- Navbar -->
-<nav class="navbar navbar-expand-lg navbar-dark navbar-custom px-4">
-    <a class="navbar-brand fw-bold" href="#">Enterprise Quiz</a>
-
-    <div class="ms-auto">
-        <span class="me-3">Welcome, {{ request.user.username }}</span>
-        <a href="{% url 'logout' %}" class="btn btn-glow text-white">Logout</a>
-    </div>
-</nav>
-
-<div class="container mt-5">
-
-    <h2 class="mb-4 fw-bold">Student Dashboard</h2>
-
-    <!-- Error Messages -->
-    {% if messages %}
-        {% for message in messages %}
-            <div class="alert alert-danger text-dark">
-                {{ message }}
-            </div>
-        {% endfor %}
-    {% endif %}
-
-    <div class="row g-4">
-
-        <div class="col-md-4">
-            <div class="glass-card text-center">
-                <p>Total Quizzes Attempted</p>
-                <div class="stat-number">{{ total_attempts }}</div>
-            </div>
-        </div>
-
-        <div class="col-md-4">
-            <div class="glass-card text-center">
-                <p>Average Score</p>
-                <div class="stat-number">{{ average_score }}%</div>
-            </div>
-        </div>
-
-        <div class="col-md-4">
-            <div class="glass-card text-center">
-                <p>Highest Score</p>
-                <div class="stat-number">{{ highest_score }}%</div>
-            </div>
-        </div>
-
+<!-- ===== SIDEBAR ===== -->
+<aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+        <div class="brand-name">⚡ CodingMCQ</div>
+        <div class="brand-sub">Practice Platform</div>
     </div>
 
-    <!-- Browse Section -->
-    <div class="mt-5">
-        <div class="glass-card text-center">
-            <h4 class="mb-3">Ready for a new challenge?</h4>
-            <a href="{% url 'available_quizzes' %}" class="btn btn-glow text-white">
-                Browse Quizzes
+    <div class="sidebar-user">
+        <div class="avatar">{{ request.user.username|first|upper }}</div>
+        <div class="user-info">
+            <div class="user-name">{{ request.user.username }}</div>
+            <div class="user-role">Student</div>
+        </div>
+    </div>
+
+    <nav class="sidebar-nav">
+        <div class="nav-label">Main</div>
+        <a href="#" class="nav-item-link active">
+            <i class="bi bi-grid-1x2-fill"></i> Dashboard
+        </a>
+        <a href="{% url 'available_quizzes' %}" class="nav-item-link">
+            <i class="bi bi-collection-play-fill"></i> Browse Quizzes
+        </a>
+        <a href="{% url 'past_attempts' %}" class="nav-item-link">
+            <i class="bi bi-clock-history"></i> My Attempts
+        </a>
+        <div class="nav-label" style="margin-top:12px;">Performance</div>
+        <a href="{% url 'analytics_page' %}" class="nav-item-link">
+            <i class="bi bi-bar-chart-line-fill"></i> Analytics
+        </a>
+    </nav>
+
+    <div class="sidebar-footer">
+        <a href="{% url 'logout' %}" class="logout-btn">
+            <i class="bi bi-box-arrow-left"></i> Logout
+        </a>
+    </div>
+</aside>
+
+<!-- ===== MAIN CONTENT ===== -->
+<div class="main-content">
+
+    <!-- Topbar -->
+    <header class="topbar">
+        <div class="d-flex align-items-center gap-12" style="gap:12px;">
+            <button class="mobile-toggle" id="mobileToggle">
+                <i class="bi bi-list"></i>
+            </button>
+            <div>
+                <div class="topbar-title">Welcome back, {{ request.user.username }} 👋</div>
+                <div class="topbar-subtitle">Here's your learning progress</div>
+            </div>
+        </div>
+        <div class="topbar-actions">
+            <a href="{% url 'available_quizzes' %}" class="btn-accent" style="text-decoration:none; padding: 10px 20px; border-radius:10px; font-size:0.85rem;">
+                <i class="bi bi-plus-lg me-1"></i> Take a Quiz
             </a>
         </div>
-    </div>
+    </header>
 
-    <!-- Join Quiz Section -->
-    <div class="mt-4">
-        <div class="glass-card text-center">
+    <!-- Page Content -->
+    <div class="page-content">
 
-            <h4 class="mb-3">Have a Quiz Code?</h4>
+        <!-- Messages -->
+        {% if messages %}
+            {% for message in messages %}
+            <div class="alert-custom">
+                <i class="bi bi-exclamation-circle-fill"></i> {{ message }}
+            </div>
+            {% endfor %}
+        {% endif %}
 
-            <form method="POST" action="{% url 'join_quiz' %}">
-                {% csrf_token %}
+        <!-- Stat Cards -->
+        <div class="stats-grid">
+            <div class="stat-card c1">
+                <div class="stat-icon"><i class="bi bi-trophy-fill"></i></div>
+                <div class="stat-value">{{ total_attempts }}</div>
+                <div class="stat-label">Quizzes Attempted</div>
+                <span class="stat-badge" style="background:rgba(99,102,241,0.15); color:#818CF8;">Total</span>
+            </div>
 
-                <div class="row justify-content-center">
-                    <div class="col-md-4">
-                        <input type="text" name="quiz_code"
-                               class="form-control text-center"
-                               placeholder="Enter Quiz Code (e.g. AB12CD)"
-                               required>
+            <div class="stat-card c2">
+                <div class="stat-icon"><i class="bi bi-graph-up-arrow"></i></div>
+                <div class="stat-value">{{ average_score }}%</div>
+                <div class="stat-label">Average Score</div>
+                <span class="stat-badge" style="background:rgba(6,182,212,0.15); color:#22D3EE;">Avg</span>
+            </div>
+
+            <div class="stat-card c3">
+                <div class="stat-icon"><i class="bi bi-star-fill"></i></div>
+                <div class="stat-value">{{ highest_score }}%</div>
+                <div class="stat-label">Personal Best</div>
+                <span class="stat-badge" style="background:rgba(16,185,129,0.15); color:#34D399;">Best</span>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="action-grid">
+            <a href="{% url 'available_quizzes' %}" class="action-card">
+                <div class="action-icon" style="background:rgba(99,102,241,0.15); color:#6366F1;">
+                    <i class="bi bi-collection-play-fill"></i>
+                </div>
+                <div class="action-text">
+                    <div class="action-title">Browse Quizzes</div>
+                    <div class="action-desc">Find and take available quizzes</div>
+                </div>
+            </a>
+            <a href="{% url 'past_attempts' %}" class="action-card">
+                <div class="action-icon" style="background:rgba(16,185,129,0.15); color:#10B981;">
+                    <i class="bi bi-clock-history"></i>
+                </div>
+                <div class="action-text">
+                    <div class="action-title">Past Attempts</div>
+                    <div class="action-desc">Review your quiz history</div>
+                </div>
+            </a>
+        </div>
+
+        <!-- Main Grid -->
+        <div class="content-grid">
+
+            <!-- Join Quiz + Performance -->
+            <div style="display:flex; flex-direction:column; gap:24px;">
+
+                <!-- Join with Code -->
+                <div class="panel">
+                    <div class="panel-header">
+                        <div class="panel-title">
+                            <i class="bi bi-qr-code-scan"></i> Join with Quiz Code
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <p style="color:var(--text-secondary); font-size:0.875rem; margin-bottom:4px;">
+                            Got a quiz code from your teacher? Enter it below to jump straight in.
+                        </p>
+                        <form method="POST" action="{% url 'join_quiz' %}" id="joinForm">
+                            {% csrf_token %}
+                            <div class="code-input-wrapper">
+                                <input type="text" name="quiz_code" id="quiz_code"
+                                       class="code-input"
+                                       placeholder="Enter code e.g. AB12CD"
+                                       maxlength="8" required autocomplete="off">
+                                <button type="submit" class="btn-accent" id="joinBtn">
+                                    <i class="bi bi-arrow-right-circle-fill me-1"></i> Join
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 </div>
 
-                <div class="mt-3">
-                    <button type="submit" class="btn btn-glow text-white">
-                        Join Quiz
-                    </button>
+                <!-- Performance Chart -->
+                <div class="panel">
+                    <div class="panel-header">
+                        <div class="panel-title">
+                            <i class="bi bi-bar-chart-fill"></i> Score Performance
+                        </div>
+                        <span style="font-size:0.75rem; color:var(--text-muted);">Last attempts</span>
+                    </div>
+                    <div class="panel-body">
+                        <div class="chart-container">
+                            <canvas id="performanceChart"></canvas>
+                        </div>
+                    </div>
                 </div>
 
-            </form>
+            </div>
 
+            <!-- Right column: Score breakdown -->
+            <div style="display:flex; flex-direction:column; gap:24px;">
+
+                <!-- Score Breakdown -->
+                <div class="panel">
+                    <div class="panel-header">
+                        <div class="panel-title">
+                            <i class="bi bi-pie-chart-fill"></i> Score Breakdown
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="progress-item">
+                            <div class="progress-label">
+                                <span>Average Score</span>
+                                <span>{{ average_score }}%</span>
+                            </div>
+                            <div class="progress-bar-bg">
+                                <div class="progress-bar-fill"
+                                     style="--fill-width: {{ average_score }}%; background: linear-gradient(90deg, #6366F1, #8B5CF6);">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="progress-item">
+                            <div class="progress-label">
+                                <span>Personal Best</span>
+                                <span>{{ highest_score }}%</span>
+                            </div>
+                            <div class="progress-bar-bg">
+                                <div class="progress-bar-fill"
+                                     style="--fill-width: {{ highest_score }}%; background: linear-gradient(90deg, #10B981, #059669);">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="progress-item">
+                            <div class="progress-label">
+                                <span>Completion Rate</span>
+                                <span>{{ total_attempts }} quiz{% if total_attempts != 1 %}zes{% endif %}</span>
+                            </div>
+                            <div class="progress-bar-bg">
+                                <div class="progress-bar-fill"
+                                     style="--fill-width: {% if total_attempts > 0 %}100{% else %}0{% endif %}%; background: linear-gradient(90deg, #F59E0B, #D97706);">
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr style="border-color: var(--border); margin: 20px 0;">
+
+                        <a href="{% url 'analytics_page' %}" class="btn-outline-accent w-100 justify-content-center" style="display:flex;">
+                            <i class="bi bi-bar-chart-line-fill"></i> View Full Analytics
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Tips Card -->
+                <div class="panel" style="background: linear-gradient(135deg, rgba(99,102,241,0.12), rgba(6,182,212,0.06)); border-color: rgba(99,102,241,0.2);">
+                    <div class="panel-body">
+                        <div style="font-size:1.5rem; margin-bottom:10px;">💡</div>
+                        <div style="font-weight:700; margin-bottom:6px; font-size:0.9rem;">Pro Tip</div>
+                        <div style="font-size:0.82rem; color:var(--text-secondary); line-height:1.6;">
+                            Practice consistently! Students who attempt quizzes regularly improve their scores by up to <strong style="color:#818CF8;">40%</strong> within a month.
+                        </div>
+                    </div>
+                </div>
+
+            </div>
         </div>
-    </div>
 
+    </div>
 </div>
 
-<script src='https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js'></script>
-<script src="{% static 'js/main.js' %}"></script>
-
-<!-- Result Pop-up Modal -->
+<!-- ===== RESULT MODAL ===== -->
 {% if last_attempt %}
 <div class="modal fade" id="resultModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content glass-card result-modal-content">
-            <div class="modal-header border-0">
-                <h5 class="modal-title fw-bold">🚀 Quiz Result</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        <div class="modal-content" style="border-radius:20px;">
+            <div class="modal-header border-0 pb-0 pt-4 px-4">
+                <h5 class="modal-title fw-bold">🎉 Quiz Completed!</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
-            <div class="modal-body text-center">
-                <div class="result-percentage">{{ last_attempt.percentage|floatformat:0 }}%</div>
-                <h4 class="fw-bold">{{ last_attempt.quiz.title }}</h4>
-                <hr class="result-divider">
-                <div class="row mt-3">
-                    <div class="col-6 mb-3">
-                        <small class="result-stat-label">MARKS</small>
-                        <span class="fw-bold result-stat-value">{{ last_attempt.score }} / {{ last_attempt.total_marks }}</span>
+            <div class="modal-body text-center px-5 py-4">
+                <div class="score-ring" style="--pct: {{ last_attempt.percentage|floatformat:0 }}% 360deg;">
+                    <div class="score-ring-text">{{ last_attempt.percentage|floatformat:0 }}%</div>
+                </div>
+
+                <h4 class="fw-bold mb-1">{{ last_attempt.quiz.title }}</h4>
+                <p style="color:var(--text-secondary); font-size:0.85rem;">Quiz completed successfully</p>
+
+                <div class="row mt-3 g-3">
+                    <div class="col-6">
+                        <div style="background:rgba(99,102,241,0.1); border-radius:12px; padding:14px;">
+                            <div style="font-size:0.7rem; color:var(--text-muted); text-transform:uppercase; font-weight:600; letter-spacing:0.5px;">Score</div>
+                            <div style="font-size:1.4rem; font-weight:800; color:#818CF8; margin-top:4px;">
+                                {{ last_attempt.score }}/{{ last_attempt.total_marks }}
+                            </div>
+                        </div>
                     </div>
-                    <div class="col-6 mb-3">
-                        <small class="result-stat-label">RANK</small>
-                        <span class="fw-bold text-warning result-stat-value">#{{ last_attempt.rank }}</span>
+                    <div class="col-6">
+                        <div style="background:rgba(245,158,11,0.1); border-radius:12px; padding:14px;">
+                            <div style="font-size:0.7rem; color:var(--text-muted); text-transform:uppercase; font-weight:600; letter-spacing:0.5px;">Rank</div>
+                            <div style="font-size:1.4rem; font-weight:800; color:#F59E0B; margin-top:4px;">
+                                #{{ last_attempt.rank }}
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
             <div class="modal-footer border-0 justify-content-center pb-4">
-                <button type="button" class="btn btn-primary rounded-pill px-5 fw-bold btn-result-close" data-bs-dismiss="modal">Great!</button>
+                <button type="button" class="btn-accent px-5" style="border-radius:12px; padding:12px 40px;" data-bs-dismiss="modal">
+                    Awesome! 🚀
+                </button>
             </div>
         </div>
     </div>
 </div>
 {% endif %}
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+{# ---- Chart score data stored safely outside JS ---- #}
+<script id="chart-scores" type="application/json">
+    [{{ average_score }}, {{ highest_score }}, 100]
+</script>
+
+{# ---- Modal trigger flag stored as a data attribute, not inside JS ---- #}
+{% if last_attempt %}
+<div id="result-modal-trigger" data-show="true" style="display:none;"></div>
+{% endif %}
+
+<script>
+    // Mobile sidebar toggle
+    const sidebar = document.getElementById('sidebar');
+    const toggle = document.getElementById('mobileToggle');
+    if (toggle) {
+        toggle.addEventListener('click', () => sidebar.classList.toggle('open'));
+    }
+
+    // Show result modal — triggered by presence of a DOM element, not a Django tag in JS
+    document.addEventListener('DOMContentLoaded', function() {
+        const modalTrigger = document.getElementById('result-modal-trigger');
+        const modalEl = document.getElementById('resultModal');
+        if (modalTrigger && modalEl && modalTrigger.dataset.show === 'true') {
+            var modal = new bootstrap.Modal(modalEl);
+            modal.show();
+        }
+    });
+
+    // Performance Chart — scores read from JSON script element (no Django tags in JS)
+    const ctx = document.getElementById('performanceChart');
+    const scoresEl = document.getElementById('chart-scores');
+    if (ctx && scoresEl) {
+        const scores = JSON.parse(scoresEl.textContent);
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Avg Score', 'Best Score', 'Target'],
+                datasets: [{
+                    label: 'Score (%)',
+                    data: scores,
+                    backgroundColor: [
+                        'rgba(99,102,241,0.7)',
+                        'rgba(16,185,129,0.7)',
+                        'rgba(255,255,255,0.06)'
+                    ],
+                    borderColor: [
+                        'rgba(99,102,241,1)',
+                        'rgba(16,185,129,1)',
+                        'rgba(255,255,255,0.1)'
+                    ],
+                    borderWidth: 1,
+                    borderRadius: 8,
+                    borderSkipped: false,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: '#111827',
+                        titleColor: '#F1F5F9',
+                        bodyColor: '#94A3B8',
+                        borderColor: 'rgba(255,255,255,0.1)',
+                        borderWidth: 1,
+                        callbacks: {
+                            label: ctx => ` ${ctx.parsed.y}%`
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: { color: 'rgba(255,255,255,0.04)' },
+                        ticks: { color: '#94A3B8', font: { size: 12 } },
+                        border: { color: 'rgba(255,255,255,0.06)' }
+                    },
+                    y: {
+                        grid: { color: 'rgba(255,255,255,0.04)' },
+                        ticks: { color: '#94A3B8', font: { size: 12 }, callback: v => v + '%' },
+                        border: { color: 'rgba(255,255,255,0.06)' },
+                        min: 0, max: 100
+                    }
+                }
+            }
+        });
+    }
+
+    // Animate code input
+    const codeInput = document.getElementById('quiz_code');
+    if (codeInput) {
+        codeInput.addEventListener('input', function() {
+            this.value = this.value.toUpperCase();
+        });
+    }
+</script>
 </body>
 </html>
